@@ -1,0 +1,789 @@
+openapi: 3.0.0
+servers: 
+  - url: 'https://artapi.ew.r.appspot.com/api'
+info:
+  description: Art related API.
+  version: 1.0.0
+  title: ArtAPI - LAB-3 Grupo 2
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: museums
+    description: Museums
+  - name: paintings
+    description: Paintings
+  - name: sculptures
+    description: Sculptures
+paths:
+  /museums:
+    get:
+      tags:
+        - museums
+      summary: Get museums
+      description: Get all museums
+      operationId: getAllMuseums
+      parameters:
+        - name: order
+          in: query
+          description: Order results by name
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - '-name'
+        - name: isEmpty
+          in: query
+          description: Filter empty museums
+          required: false
+          schema:
+            type: boolean
+        - name: q
+          in: query
+          description: Query to filter
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description:  Maximum number of results
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Offset of the results
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Number of page when there is a limit
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results matching criteria
+          content:
+            application/json:
+              example:
+                - museumId: m1
+                  name: Louvre
+                  country: Francia
+                  city: Paris
+                  openingYear: '1793'
+                  paintings: 
+                    - paintingId: p1
+                      name: La Gioconda
+                      artist: Leonardo da Vinci
+                      year: '1503'
+                      technique: Pintura al Óleo
+                      style: Renacimiento
+                    - paintingId: p2
+                      name: La noche estrellada
+                      artist: Vincent van Gogh
+                      year: '1886'
+                      technique: Pintura al Óleo
+                      style: Postimpresionismo
+                  sculptures : 
+                    - sculptureId: s1
+                      name: David
+                      artist: Miguel Ángel
+                      year: '1501'
+                      material: Mármol Blanco
+                    - sculptureId: s2
+                      name: El Pensador
+                      artist: Auguste Rodin
+                      year: '1904'
+                      material: Bronce
+        '400':
+          description: Bad request
+    post:
+      tags:
+        - museums
+      summary: Create a museum
+      description: Create a museum
+      operationId: addMuseum
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Museum'
+        description: Museum to create
+        required: true
+      responses:
+        '201':
+          description: Museum created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Museum'
+              example:
+                museumId: m1
+                name: Louvre
+                country: Francia
+                city: Paris
+                openingYear: '1793'
+                paintings: null
+                sculptures : null
+        '400':
+          description: Bad request
+  '/museums/{id}':
+    get:
+      tags:
+        - museums
+      summary: Get museum
+      description: Get a museum
+      operationId: getMuseum
+      parameters:
+        - name: id
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: museum found
+          content:
+            application/json:
+              example:
+                museumId: m1
+                name: Louvre
+                country: Francia
+                city: Paris
+                openingYear: '1793'
+                paintings: 
+                  - paintingId: p1
+                    name: La Gioconda
+                    artist: Leonardo da Vinci
+                    year: '1503'
+                    technique: Pintura al Óleo
+                    style: Renacimiento
+                  - paintingId: p2
+                    name: La noche estrellada
+                    artist: Vincent van Gogh
+                    year: '1886'
+                    technique: Pintura al Óleo
+                    style: Postimpresionismo
+                sculptures : 
+                  - sculptureId: s1
+                    name: David
+                    artist: Miguel Ángel
+                    year: '1501'
+                    material: Mármol Blanco
+                  - sculptureId: s2
+                    name: El Pensador
+                    artist: Auguste Rodin
+                    year: '1904'
+                    material: Bronce
+        '404':
+          description: museum not found
+    put:
+      tags:
+        - museums
+      summary: Update museum
+      description: Update a museum
+      operationId: updateMuseum
+      parameters:
+        - name: id
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Museum'
+      responses:
+        '204':
+          description: Museum updated
+          content:
+            application/json:
+              example:
+                museumId: m1
+                name: Museo del Louvre
+                country: Francia
+                city: Paris
+                openingYear: '2025'
+                paintings: null
+                sculptures : null
+        '400':
+          description: Bad request
+        '404':
+          description: Museum not found
+    delete:
+      tags:
+        - museums
+      summary: Delete museum
+      description: Delete museum
+      operationId: removeMuseum
+      parameters:
+        - name: id
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Museum deleted
+        '404':
+          description: Museum not found
+  '/museums/{museumId}/paintings/{paintingId}':
+    post:
+      tags:
+        - museums
+      summary: Add a painting to a museum
+      description: Add a painting to a museum
+      operationId: addPaintingToMuseum
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      parameters:
+        - name: museumId
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+        - name: paintingId
+          in: path
+          description: Id of the painting
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Painting added to the museum
+          content:
+            application/json:
+              example:
+                museumId: m1
+                name: Louvre
+                country: Francia
+                city: Paris
+                openingYear: '1793'
+                paintings: 
+                  - paintingId: p1
+                    name: La Gioconda
+                    artist: Leonardo da Vinci
+                    year: '1503'
+                    technique: Pintura al Óleo
+                    style: Renacimiento
+                  - paintingId: p2
+                    name: La noche estrellada
+                    artist: Vincent van Gogh
+                    year: '1886'
+                    technique: Pintura al Óleo
+                    style: Postimpresionismo
+                sculptures : 
+                  - sculptureId: s1
+                    name: David
+                    artist: Miguel Ángel
+                    year: '1501'
+                    material: Mármol Blanco
+                  - sculptureId: s2
+                    name: El Pensador
+                    artist: Auguste Rodin
+                    year: '1904'
+                    material: Bronce
+        '400':
+          description: Bad request
+        '404':
+          description: Id not found
+    delete:
+      tags:
+        - museums
+      summary: Delete a painting from a museum
+      description: Delete a painting from a museum
+      operationId: removePaintingFromMuseum
+      parameters:
+        - name: museumId
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+        - name: paintingId
+          in: path
+          description: Id of the painting
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Painting deleted from the museum
+        '404':
+          description: Id not found
+  '/museums/{museumId}/sculptures/{sculptureId}':
+    post:
+      tags:
+        - museums
+      summary: Add a sculpture to a museum
+      description: Add a sculpture to a museum
+      operationId: addSculptureToMuseum
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      parameters:
+        - name: museumId
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+        - name: sculptureId
+          in: path
+          description: Id of the sculpture
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Sculpture added to the museum
+          content:
+            application/json:
+              example:
+                museumId: m1
+                name: Louvre
+                country: Francia
+                city: Paris
+                openingYear: '1793'
+                paintings: 
+                  - paintingId: p1
+                    name: La Gioconda
+                    artist: Leonardo da Vinci
+                    year: '1503'
+                    technique: Pintura al Óleo
+                    style: Renacimiento
+                  - paintingId: p2
+                    name: La noche estrellada
+                    artist: Vincent van Gogh
+                    year: '1886'
+                    technique: Pintura al Óleo
+                    style: Postimpresionismo
+                sculptures : 
+                  - sculptureId: s1
+                    name: David
+                    artist: Miguel Ángel
+                    year: '1501'
+                    material: Mármol Blanco
+                  - sculptureId: s2
+                    name: El Pensador
+                    artist: Auguste Rodin
+                    year: '1904'
+                    material: Bronce
+        '400':
+          description: Bad request
+        '404':
+          description: Id not found
+    delete:
+      tags:
+        - museums
+      summary: Delete a sculpture from a museum
+      description: Delete a sculpture from a museum
+      operationId: removeSculptureFromMuseum
+      parameters:
+        - name: museumId
+          in: path
+          description: Id of the museum
+          required: true
+          schema:
+            type: string
+        - name: sculptureId
+          in: path
+          description: Id of the sculpture
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Sculpture deleted from the museum
+        '404':
+          description: Id not found
+  /paintings:
+    get:
+      tags:
+        - paintings
+      summary: Get paintings
+      description: Get all paintings
+      operationId: getAllPaintings
+      parameters:
+        - name: order
+          in: query
+          description: Order results by name
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - '-name'
+        - name: knownArtist
+          in: query
+          description: Filter known artist paintings
+          required: false
+          schema:
+            type: boolean
+        - name: q
+          in: query
+          description: Query to filter
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description:  Maximum number of results
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Offset of the results
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Number of page when there is a limit
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results matching criteria
+          content:
+            application/json:
+              example:
+                - paintingId: p1
+                  name: La Gioconda
+                  artist: Leonardo da Vinci
+                  year: '1503'
+                  technique: Pintura al Óleo
+                  style: Renacimiento
+        '400':
+          description: Bad request
+    post:
+      tags:
+        - paintings
+      summary: Create a painting
+      description: Create a painting
+      operationId: addPainting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Painting'
+        description: Painting to create
+        required: true
+      responses:
+        '201':
+          description: Painting created
+          content:
+            application/json:
+              example:
+                paintingId: p1
+                name: La Gioconda
+                artist: Leonardo da Vinci
+                year: '1503'
+                technique: Pintura al Óleo
+                style: Renacimiento
+        '400':
+          description: Bad request
+  '/paintings/{id}':
+    get:
+      tags:
+        - paintings
+      summary: Get painting
+      description: Get a painting
+      operationId: getPainting
+      parameters:
+        - name: id
+          in: path
+          description: Id of the painting
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Painting found
+          content:
+            application/json:
+              example:
+                paintingId: p1
+                name: La Gioconda
+                artist: Leonardo da Vinci
+                year: '1503'
+                technique: Pintura al Óleo
+                style: Renacimiento
+        '404':
+          description: Painting not found
+    put:
+      tags:
+        - paintings
+      summary: Update painting
+      description: Update a painting
+      operationId: updatePainting
+      parameters:
+        - name: id
+          in: path
+          description: Id of the painting
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Painting'
+      responses:
+        '204':
+          description: Painting updated
+          content:
+            application/json:
+              example:
+                paintingId: p1
+                name: La Gioconda
+                artist: Leonardo da Vinci
+                year: '1503'
+                technique: Pintura al Óleo
+                style: Renacimiento
+        '400':
+          description: Bad request
+        '404':
+          description: Painting not found
+    delete:
+      tags:
+        - paintings
+      summary: Delete painting
+      description: Delete painting
+      operationId: removePainting
+      parameters:
+        - name: id
+          in: path
+          description: Id of the painting
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Painting deleted
+        '404':
+          description: Painting not found
+  /sculptures:
+    get:
+      tags:
+        - sculptures
+      summary: Get sculptures
+      description: Get all sculptures
+      operationId: getAllSculptures
+      parameters:
+        - name: order
+          in: query
+          description: Order results by name
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - '-name'
+        - name: knownArtist
+          in: query
+          description: Filter known artist sculptures
+          required: false
+          schema:
+            type: boolean
+        - name: q
+          in: query
+          description: Query to filter
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description:  Maximum number of results
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Offset of the results
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Number of page when there is a limit
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results matching criteria
+          content:
+            application/json:
+              example:
+                - sculptureId: s1
+                  name: David
+                  artist: Miguel Ángel
+                  year: '1501'
+                  material: Mármol Blanco
+        '400':
+          description: Bad request
+    post:
+      tags:
+        - sculptures
+      summary: Create a sculpture
+      description: Create a sculpture
+      operationId: addSculpture
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sculpture'
+        description: Sculpture to create
+        required: true
+      responses:
+        '201':
+          description: Sculpture created
+          content:
+            application/json:
+              example:
+                sculptureId: s1
+                name: David
+                artist: Miguel Ángel
+                year: '1501'
+                material: Mármol Blanco
+        '400':
+          description: Bad request
+  '/sculptures/{id}':
+    get:
+      tags:
+        - sculptures
+      summary: Get sculpture
+      description: Get a sculpture
+      operationId: getSculpture
+      parameters:
+        - name: id
+          in: path
+          description: Id of the sculpture
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sculpture found
+          content:
+            application/json:
+              example:
+                sculptureId: s1
+                name: David
+                artist: Miguel Ángel
+                year: '1501'
+                material: Mármol Blanco
+        '404':
+          description: Sculpture not found
+    put:
+      tags:
+        - sculptures
+      summary: Update sculpture
+      description: Update a sculpture
+      operationId: updateSculpture
+      parameters:
+        - name: id
+          in: path
+          description: Id of the sculpture
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sculpture'
+      responses:
+        '204':
+          description: Sculpture updated
+          content:
+            application/json:
+              example:
+                sculptureId: s1
+                name: David
+                artist: Miguel Ángel
+                year: '1501'
+                material: Mármol Blanco
+        '400':
+          description: Bad request
+        '404':
+          description: Sculpture not found
+    delete:
+      tags:
+        - sculptures
+      summary: Delete sculpture
+      description: Delete sculpture
+      operationId: removeSculpture
+      parameters:
+        - name: id
+          in: path
+          description: Id of the sculpture
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Sculpture deleted
+        '404':
+          description: Sculpture not found
+components:
+  schemas:
+    Painting:
+      type: object
+      required:
+        - name
+        - artist
+      properties:
+        name:
+          type: string
+        artist:
+          type: string
+        year:
+          type: string
+        technique:
+          type: string 
+        style:
+          type: string 
+    Sculpture:
+      type: object
+      required:
+        - name
+        - artist
+      properties:
+        name:
+          type: string
+        artist:
+          type: string
+        year:
+          type: string
+        material:
+          type: string 
+    Museum:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        openingYear:
+          type: string
